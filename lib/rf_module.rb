@@ -1,13 +1,16 @@
+require 'highline/import'
 module XBee
 
-  def ask_user_for_input(list_array, input, output)
-    output.puts "Multiple USB Serial devices found.\nWhich would you like to use?"
-    output.puts "------------------------------------"
-    list_array.each { |dev| output.puts dev }
-
+  def ask_user_for_input(list_array, input = STDIN, output = STDOUT)
+    terminal = HighLine.new(input, output)
+    answer = terminal.choose do |menu|
+      menu.prompt = "Multiple USB Serial devices found. Which would you like to use?"
+      list_array.each { |dev| menu.choice dev.to_sym do dev end }
+    end
+    answer
   end
 
-  def get_xbee_usbdev_str(output = STDOUT, input = STDIN)
+  def get_xbee_usbdev_str(input = STDIN, output = STDOUT)
     begin
       devices = Dir.glob("/dev/cu\.usbserial*")
       case devices.length
@@ -42,7 +45,7 @@ module XBee
     ##
     # This is the way we instantiate XBee modules now, via this factory method. It will ultimately autodetect what
     # flavor of XBee module we're using and return the most appropriate subclass to control that module.
-    def initialize(xbee_usbdev_str = "/dev/tty.usbserial-A7004nmf", uart_config = XBeeUARTConfig.new)
+    def initialize(xbee_usbdev_str = get_xbee_usbdev_str, uart_config = XBeeUARTConfig.new)
       unless uart_config.kind_of?(XBeeUARTConfig)
         raise "uart_config must be an instance of XBeeUARTConfig for this to work"
       end

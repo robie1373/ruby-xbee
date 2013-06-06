@@ -59,6 +59,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency "serialport", "~>1.1.0"
   s.add_dependency "rake", "10.0.4"
+  s.add_dependency 'highline', "~>1.6.18"
 
   s.add_development_dependency "rspec"
 end
