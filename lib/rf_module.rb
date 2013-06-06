@@ -12,6 +12,13 @@ module XBee
 
   def get_xbee_usbdev_str(input = STDIN, output = STDOUT)
     begin
+      unless input.tty?
+        unless input.is_a? StringIO
+          input = StringIO.new
+          input << "1\n"
+          input.rewind
+        end
+      end
       devices = Dir.glob("/dev/cu\.usbserial*")
       case devices.length
         when 0

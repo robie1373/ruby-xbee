@@ -80,7 +80,7 @@ $stdout.sync = true
 
 require 'pp'
 
-@xbee = XBee.new( @xbee_usbdev_str, @xbee_baud, @data_bits, @stop_bits, @parity )
+@xbee = XBee.new( @serial_config.xbee_usbdev_str, @serial_config.xbee_baud, @serial_config.data_bits, @serial_config.stop_bits, @serial_config.parity )
 
 puts "Attention: #{@xbee.attention}"
 puts "Firmware: #{@xbee.fw_rev}"

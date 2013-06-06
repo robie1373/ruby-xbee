@@ -47,12 +47,21 @@ module XBee
 
   describe RFModule do
     include XBee
+
+    before(:each) do
+      @input = StringIO.new
+      @output = StringIO.new
+      @input << "1\n"
+      @input.rewind
+      @rfmodule = RFModule.new(get_xbee_usbdev_str(@input, @output))
+    end
+
     it "should initialize correctly" do
-      input = StringIO.new
-      output = StringIO.new
-      input << "1\n"
-      input.rewind
-      RFModule.new(get_xbee_usbdev_str(input, output)).should be_a_kind_of RFModule
+      @rfmodule.should be_a_kind_of RFModule
+    end
+
+    it "should have good attributes?" do
+      @rfmodule.xbee_serialport.should be_a_kind_of SerialPort
     end
   end
 end
