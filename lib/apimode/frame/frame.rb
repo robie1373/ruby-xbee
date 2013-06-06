@@ -40,12 +40,18 @@ module XBee
         raise "Bad checksum - data discarded"
       end
       case data[0]
-      when 0x8A : ModemStatus.new(data)
-      when 0x88 : ATCommandResponse.new(data)
-      when 0x97 : RemoteCommandResponse.new(data)
-      when 0x8B : TransmitStatus.new(data)
-      when 0x90 : ReceivePacket.new(data)
-      when 0x91 : ExplicitRxIndicator.new(data)
+        when 0x8A
+          ModemStatus.new(data)
+        when 0x88
+          ATCommandResponse.new(data)
+        when 0x97
+          RemoteCommandResponse.new(data)
+        when 0x8B
+          TransmitStatus.new(data)
+        when 0x90
+          ReceivePacket.new(data)
+        when 0x91
+          ExplicitRxIndicator.new(data)
       else ReceivedFrame.new(data)
       end
     end

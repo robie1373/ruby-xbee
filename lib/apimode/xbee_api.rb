@@ -1,6 +1,7 @@
 $: << File.dirname(__FILE__)
 require 'frame/frame'
-require File.dirname(File.dirname(__FILE__)) + '/ruby_xbee'
+#require File.dirname(File.dirname(__FILE__)) + '/ruby_xbee'
+require_relative "../rf_module"
 
 module XBee
   class BaseAPIModeInterface < RFModule

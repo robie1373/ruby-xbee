@@ -57,16 +57,8 @@ Gem::Specification.new do |s|
     "test/test_helper.rb"
   ]
 
-  if s.respond_to? :specification_version then
-    current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
-    s.specification_version = 2
+  s.add_dependency "serialport", "~>1.1.0"
+  s.add_dependency "rake", "10.0.4"
 
-    if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<ruby-serialport>, [">= 0"])
-    else
-      s.add_dependency(%q<ruby-serialport>, [">= 0"])
-    end
-  else
-    s.add_dependency(%q<ruby-serialport>, [">= 0"])
-  end
+  s.add_development_dependency "rspec"
 end

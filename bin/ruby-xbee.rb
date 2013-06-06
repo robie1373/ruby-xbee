@@ -9,7 +9,8 @@ rescue LoadError => e
 end
 
 @xbee_usbdev_str = case ARGV[0]
-  when "cable" : "/dev/tty.usbserial-FTE4UXEA"
+                     when "cable"
+                       "/dev/tty.usbserial-FTE4UXEA"
   else "/dev/tty.usbserial-A7004nmf"
 end
 
