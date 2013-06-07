@@ -24,6 +24,7 @@ module XBee
         # Set API Mode 2 (include escaped characters)
         self.xbee_serialport.write("ATAP2\r")
         self.xbee_serialport.read(3)
+
       end
       #@frames ||= []
       #@read_thread = Thread.new {  loop {  @frames << XBee::Frame.new(self.xbee_serialport) } rescue retry }
