@@ -15,7 +15,7 @@ module XBee
       it "should return a valid usb serial device for my environment" do
         @input << "1\n"
         @input.rewind
-        get_xbee_usbdev_str(@input, @output).should == "/dev/cu.usbserial-A9014A2H"
+        get_xbee_usbdev_str(@input, @output).should =~ /\/dev\/cu\.usbserial-......../
       end
     end
 
