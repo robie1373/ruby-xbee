@@ -38,7 +38,7 @@ class SerialConfig
 end
 
 @serial_config = SerialConfig.new
-
+#puts "this is the endo of ruby-xbee"
 #    case ARGV[0]
 #                     when "cable"
 #                       "/dev/tty.usbserial-FTE4UXEA"

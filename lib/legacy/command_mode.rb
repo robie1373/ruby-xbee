@@ -289,7 +289,7 @@ module XBee
     def baud
       @xbee_serialport.write("ATBD\r")
       baudcode = getresponse
-      @baudcodes.index( baudcode.to_i )
+      @baudcodes.key( baudcode.to_i )
     end
 
 =begin rdoc
@@ -314,7 +314,7 @@ module XBee
    def parity
      @xbee_serialport.write("ATNB\r")
      response = getresponse().strip.chomp
-     @paritycodes.index( response.to_i )
+     @paritycodes.key( response.to_i )
    end
 
 =begin rdoc
@@ -371,7 +371,7 @@ module XBee
           return :CTS
         end
       else
-        @iotypes.index(response)
+        @iotypes.key(response)
       end
 
     end

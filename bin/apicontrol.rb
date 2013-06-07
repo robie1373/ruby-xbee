@@ -6,8 +6,8 @@ require 'ruby-xbee'
 require 'pp'
 
 class ApiMode
-  def initialize
-    @xbee = XBee::BaseAPIModeInterface.new(@xbee_usbdev_str)
+  def initialize(serial_config)
+    @xbee = XBee::BaseAPIModeInterface.new(serial_config.xbee_usbdev_str)
   end
 
   def output
@@ -48,7 +48,7 @@ class ApiMode
   end
 end
 
-apimode = ApiMode.new
+apimode = ApiMode.new(@serial_config)
 if apimode.output.tty?
-  ApiMode.new.run
+  apimode.run
 end

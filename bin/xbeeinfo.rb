@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby -rubygems
+#!/usr/bin/env ruby 
 # == Synopsis
 # xbeeinfo.rb - A Ruby utility for extracting XBee setup information using xbee ruby class (Ruby::XBee)
 #
@@ -80,31 +80,58 @@ $stdout.sync = true
 
 require 'pp'
 
-@xbee = XBee.new( @serial_config.xbee_usbdev_str, @serial_config.xbee_baud, @serial_config.data_bits, @serial_config.stop_bits, @serial_config.parity )
+class XBeeInfo
+  def initialize(serial_config = @serial_config, output = STDOUT)
+    @xbee = XBee.new(serial_config.xbee_usbdev_str, serial_config.xbee_baud, serial_config.data_bits, serial_config.stop_bits, serial_config.parity)
+    @output = output
+  end
 
-puts "Attention: #{@xbee.attention}"
-puts "Firmware: #{@xbee.fw_rev}"
-puts "Hardware: #{@xbee.hw_rev}"
+  #Info = Struct.new(:attention, :firmware, :hardware, :baud, :parity,
+  #                  :neighbors, :node_id, :channel, :pan_id, :my, :sh,
+  #                  :sl, :dh, :dl, :rssi, :ports)
+  #
+  #info = Info.new
+  #
+  def print
+    output.puts "Attention: #{@xbee.attention}"
+    output.puts "Firmware: #{@xbee.fw_rev}"
+    output.puts "Hardware: #{@xbee.hw_rev}"
 
-puts "Baud: #{@xbee.baud}"
-puts "Parity: #{@xbee.parity}"
+    output.puts "Baud: #{@xbee.baud}"
+    output.puts "Parity: #{@xbee.parity}"
 
-puts "Neighbors:"
-pp @xbee.neighbors
+    output.puts "Neighbors:"
+    pp @xbee.neighbors
 
-puts "Node ID: #{@xbee.node_id}"
-puts "Channel: #{@xbee.channel}"
-puts "PAN ID: #{@xbee.pan_id}"
-puts "MY: #{@xbee.my_src_address}"
-puts "SH: #{@xbee.serial_num_high}"
-puts "SL: #{@xbee.serial_num_low}"
-puts "DH: #{@xbee.destination_high}"
-puts "DL: #{@xbee.destination_low}"
-puts "Last received signal strength (dBm): #{@xbee.received_signal_strength}"
+    output.puts "Node ID: #{@xbee.node_id}"
+    output.puts "Channel: #{@xbee.channel}"
+    output.puts "PAN ID: #{@xbee.pan_id}"
+    output.puts "MY: #{@xbee.my_src_address}"
+    output.puts "SH: #{@xbee.serial_num_high}"
+    output.puts "SL: #{@xbee.serial_num_low}"
+    output.puts "DH: #{@xbee.destination_high}"
+    output.puts "DL: #{@xbee.destination_low}"
+    output.puts "Last received signal strength (dBm): #{@xbee.received_signal_strength}"
 
-0.upto(8) do | num |
-  portsym = "D#{num}".to_sym
-  puts "Port #{num}: #{@xbee.dio( portsym )}"
+    0.upto(8) do |num|
+      portsym = "D#{num}".to_sym
+      output.puts "Port #{num}: #{@xbee.dio(portsym)}"
+    end
+
+  end
+
+  def xbee
+    @xbee
+  end
+
+  def output
+    @output
+  end
 end
 
 
+xbeeinfo = XBeeInfo.new(@serial_config)
+#puts "This is after the XBeeinfo object instantiates in xbeeinfo.rb"
+if xbeeinfo.output.tty?
+  xbeeinfo.print
+end
