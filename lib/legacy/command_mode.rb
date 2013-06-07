@@ -20,6 +20,9 @@ module XBee
                    :Associated_Indicator => 1, :RTS => 1, :CTS => 1, :RS485_Low => 6, :RS485_High => 7 }
     end
 
+    def xbee_serial_port
+      @xbee_serialport
+    end
 
 =begin rdoc
   Puts the XBee into AT command mode and insures that we can bring it to attention.

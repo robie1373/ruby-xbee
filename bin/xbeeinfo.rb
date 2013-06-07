@@ -86,12 +86,6 @@ class XBeeInfo
     @output = output
   end
 
-  #Info = Struct.new(:attention, :firmware, :hardware, :baud, :parity,
-  #                  :neighbors, :node_id, :channel, :pan_id, :my, :sh,
-  #                  :sl, :dh, :dl, :rssi, :ports)
-  #
-  #info = Info.new
-  #
   def print
     output.puts "Attention: #{@xbee.attention}"
     output.puts "Firmware: #{@xbee.fw_rev}"
