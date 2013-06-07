@@ -14,6 +14,7 @@ module XBee
 
     describe "#fw_rev" do
       it "should get the firmware version" do
+        pending "fix up Frame first"
         @base_api_mode_interface.fw_rev.should == "foo"
       end
     end

@@ -16,11 +16,7 @@ module XBee
     end
 
     def Frame.new(source_io)
-      stray_bytes = []
-      until (start_delimiter = source_io.readchar) == 0x7e
-        puts "Stray byte 0x%x" % start_delimiter
-        stray_bytes << start_delimiter
-      end
+      stray_bytes = stray_bytes(source_io)
       puts "Got some stray bytes for ya: #{stray_bytes.map {|b| "0x%x" % b} .join(", ")}" unless stray_bytes.empty?
       header = source_io.read(3).xb_unescape
       puts "Read header: #{header.unpack("C*").join(", ")}"
@@ -54,6 +50,15 @@ module XBee
           ExplicitRxIndicator.new(data)
       else ReceivedFrame.new(data)
       end
+    end
+
+    def self.stray_bytes(source_io)
+      stray_bytes = []
+      until (start_delimiter = source_io.readchar.ord) == 0x7e
+        puts "Stray byte 0x%x" % start_delimiter.ord
+        stray_bytes << start_delimiter
+      end
+      stray_bytes
     end
 
     class Base
