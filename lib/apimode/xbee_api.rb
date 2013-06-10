@@ -31,11 +31,13 @@ module XBee
     end
 
     def get_param(at_param_name, at_param_unpack_string = nil)
+      puts "lib/apimode/xbee_api#get_param"
       frame_id = self.next_frame_id
       at_command_frame = XBee::Frame::ATCommand.new(at_param_name,frame_id,nil,at_param_unpack_string)
-      # puts "Sending ... [#{at_command_frame._dump.unpack("C*").join(", ")}]"
+      puts "Sending ... [#{at_command_frame._dump.unpack("C*").join(", ")}]"
       self.xbee_serialport.write(at_command_frame._dump)
       r = XBee::Frame.new(self.xbee_serialport)
+      puts "command response = #{r}"
       if r.kind_of?(XBee::Frame::ATCommandResponse) && r.status == :OK && r.frame_id == frame_id
         if block_given?
           yield r
@@ -106,7 +108,9 @@ module XBee
   Retrieve XBee firmware version
 =end
     def fw_rev
+      puts "lib/apimode/xbee_api#fw_rev"
       @fw_rev ||= get_param("VR","n")
+      puts "At end of lib/apimode/xbee_api#fw_rev"
     end
 
 =begin rdoc

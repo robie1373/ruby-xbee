@@ -15,26 +15,25 @@ module XBee
       0xFF - (data.unpack("C*").inject(0) { |sum, byte| (sum + byte) & 0xFF })
     end
 
-    def Frame.new(source_io)
+    def Frame.new(source_io, input = STDIN, output = STDOUT)
       stray_bytes = stray_bytes(source_io)
-      puts "Got some stray bytes for ya: #{stray_bytes.map {|b| "0x%x" % b} .join(", ")}" unless stray_bytes.empty?
-      header = source_io.read(3).xb_unescape
-      puts "Read header: #{header.unpack("C*").join(", ")}"
-      frame_remaining = frame_length = api_identifier = cmd_data = ""
-      if header.length == 3
-        frame_length, api_identifier = header.unpack("nC")
-      else
-        frame_length, api_identifier = header.unpack("n").first, source_io.readchar
-      end
-      cmd_data_intended_length = frame_length - 1
-      while ((unescaped_length = cmd_data.xb_unescape.length) < cmd_data_intended_length)
-        cmd_data += source_io.read(cmd_data_intended_length - unescaped_length)
-      end
+      output.puts "Got some stray bytes for ya: #{stray_bytes.map {|b| "0x%x" % b} .join(", ")}" unless stray_bytes.empty?
+
+      header = get_header(source_io)
+
+      frame_remaining = frame_length = api_identifier = ""
+      frame_length = get_length(header, source_io)
+      api_identifier = get_api_identifier(source_io)
+
+      cmd_data = get_cmd_data(frame_length, source_io)
+
       data = api_identifier.chr + cmd_data.xb_unescape
+
       sent_checksum = source_io.getc
       unless sent_checksum == Frame.checksum(data)
         raise "Bad checksum - data discarded"
       end
+
       case data[0]
         when 0x8A
           ModemStatus.new(data)
@@ -52,10 +51,41 @@ module XBee
       end
     end
 
-    def self.stray_bytes(source_io)
+    def self.get_cmd_data(frame_length, source_io)
+      cmd_data_intended_length = frame_length #- 1 I think the -1 was wrong
+      cmd_data = ""
+      source_io.seek(3)
+      while ((unescaped_length = cmd_data.xb_unescape.length) < cmd_data_intended_length)
+        cmd_data += source_io.read(cmd_data_intended_length - unescaped_length)
+      end
+      cmd_data
+    end
+
+    def self.get_api_identifier(source_io)
+      source_io.seek(3)
+      source_io.read(1)
+    end
+
+    def self.get_length(header, source_io)
+      header.delete!("~")
+      if header.length == 3
+        frame_length, delimiter = header.unpack("nC")
+      else
+        frame_length, delimiter = header.unpack("n").first, source_io.readchar
+      end
+      return frame_length
+    end
+
+    def self.get_header(source_io, input = STDIN, output = STDOUT)
+      header = source_io.read(3).xb_unescape
+      output.puts "Read header: #{header.unpack("C*").join(", ")}"
+      header
+    end
+
+    def self.stray_bytes(source_io, input = STDIN, output = STDOUT)
       stray_bytes = []
       until (start_delimiter = source_io.readchar.ord) == 0x7e
-        puts "Stray byte 0x%x" % start_delimiter.ord
+        output.puts "Stray byte 0x%x" % start_delimiter.ord
         stray_bytes << start_delimiter
       end
       stray_bytes
