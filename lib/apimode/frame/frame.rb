@@ -16,8 +16,9 @@ module XBee
     end
 
     def Frame.new(source_io, input = STDIN, output = STDOUT)
+      data = source_io.read
       stray_bytes = stray_bytes(source_io)
-      output.puts "Got some stray bytes for ya: #{stray_bytes.map {|b| "0x%x" % b} .join(", ")}" unless stray_bytes.empty?
+      output.puts "Got some stray bytes for ya: #{stray_bytes.map {|b| "0x%x" % b}.join(", ")}" unless stray_bytes.empty?
 
       header = get_header(source_io)
 
@@ -52,11 +53,13 @@ module XBee
     end
 
     def self.get_cmd_data(frame_length, source_io)
-      cmd_data_intended_length = frame_length #- 1 I think the -1 was wrong
+      cmd_data_intended_length = frame_length - 1 #I think the -1 was wrong
       cmd_data = ""
-      source_io.seek(3)
+      #source_io.seek(3)
+      #puts "source_io length is #{source_io.read.length}"
       while ((unescaped_length = cmd_data.xb_unescape.length) < cmd_data_intended_length)
-        cmd_data += source_io.read(cmd_data_intended_length - unescaped_length)
+        next_chunk = source_io.read(cmd_data_intended_length - unescaped_length)
+        cmd_data += next_chunk
       end
       cmd_data
     end

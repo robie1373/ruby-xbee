@@ -1,5 +1,6 @@
 require_relative "../../../../spec/spec_helper"
 require_relative "../../../../lib/apimode/frame/frame"
+require_relative "../../../../lib/rf_module"
 
 module XBee
   module Frame
@@ -41,6 +42,15 @@ module XBee
             Frame.get_header(source_io, @input, @output).should == frame[0..2]
           end
         end
+
+        it "should return a frame header from a real radio" do
+          include XBee
+          source_io = RFModule.new.xbee_serialport
+          at_command_frame = XBee::Frame::ATCommand.new("VR",1,nil,"")
+          source_io.read
+          source_io.write at_command_frame._dump
+          Frame.get_header(source_io, @input, @output).should == "~\x00\x07"
+        end
       end
 
       describe "#get_length" do
@@ -72,6 +82,16 @@ module XBee
             frame_data = frame[3..-2]
             Frame.get_cmd_data(frame_length, source_io).should == frame_data
           end
+        end
+
+        it "should get command data from a real radio" do
+          include XBee
+          source_io = RFModule.new.xbee_serialport
+          at_command_frame = XBee::Frame::ATCommand.new("VR",1,nil,"")
+          source_io.read
+          source_io.write at_command_frame._dump
+          frame = Frame.new(source_io, @input, @output)
+          frame.should be_a_kind_of Frame
         end
       end
 

@@ -36,16 +36,16 @@ module XBee
       at_command_frame = XBee::Frame::ATCommand.new(at_param_name,frame_id,nil,at_param_unpack_string)
       puts "Sending ... [#{at_command_frame._dump.unpack("C*").join(", ")}]"
       self.xbee_serialport.write(at_command_frame._dump)
-      r = XBee::Frame.new(self.xbee_serialport)
+      result = XBee::Frame.new(self.xbee_serialport)
       puts "command response = #{r}"
-      if r.kind_of?(XBee::Frame::ATCommandResponse) && r.status == :OK && r.frame_id == frame_id
+      if result.kind_of?(XBee::Frame::ATCommandResponse) && result.status == :OK && result.frame_id == frame_id
         if block_given?
-          yield r
+          yield result
         else
-          at_param_unpack_string.nil? ? r.retrieved_value : r.retrieved_value.unpack(at_param_unpack_string).first
+          at_param_unpack_string.nil? ? result.retrieved_value : result.retrieved_value.unpack(at_param_unpack_string).first
         end
       else
-        raise "Response did not indicate successful retrieval of that parameter: #{r.inspect}"
+        raise "Response did not indicate successful retrieval of that parameter: #{result.inspect}"
       end
     end
 

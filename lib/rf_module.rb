@@ -66,6 +66,10 @@ module XBee
       @node_identifier = NodeIdentifier.new
     end
 
+    def xbee_serialport
+      @xbee_serialport
+    end
+
     def in_command_mode
       sleep self.guard_time.in_seconds
       @xbee_serialport.write(self.command_character.value * 3)

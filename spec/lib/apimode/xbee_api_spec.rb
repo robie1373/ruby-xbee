@@ -26,6 +26,7 @@ module XBee
       it "should yield a Frame to a block" do
         at_param_name = "FW"
         @base_api_mode_interface.get_param(at_param_name) do | response |
+          puts "do you have a valid source_io?"
           response.should be_a_kind_of Frame
         end
       end
