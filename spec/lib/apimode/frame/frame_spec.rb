@@ -52,21 +52,30 @@ module XBee
 
       end
 
-      describe "real radio" do
-        include XBee
-        before(:all) do
-          @source_io = RFModule.new.xbee_serialport
-          @at_command_frame = XBee::Frame::ATCommand.new("VR", 1, nil, "")
-          @source_io.read
-        end
+      #############################
+      #These are brittle so you probably only want to use them if you are
+      #tracking down trouble elsewhere. Rely on the integration tests and xbee_api_spec
+      #for this instead.
+      #
+      #describe "real radio" do
+      #  include XBee
+      #  before(:all) do
+      #    @source_io = RFModule.new.xbee_serialport
+      #    @at_command_frame = XBee::Frame::ATCommand.new("VR", 1, nil, "")
+      #    @source_io.read
+      #  end
+      #
+      #  it "should compute a good checksum from a real radio" do
+      #    @source_io.write @at_command_frame._dump
+      #    frame = Frame.new(@source_io, @input, @output)
+      #    frame.checksum.should == 0x8A
+      #  end
+      #
+      #end
+      #
+      ##############################
 
-        it "should compute a good checksum from a real radio" do
-          @source_io.write @at_command_frame._dump
-          frame = Frame.new(@source_io, @input, @output)
-          frame.checksum.should == 0x8A
-        end
 
-      end
       #describe "#get_length" do
       #  it "should return the length" do
       #    @sample_frames.each do |frame|

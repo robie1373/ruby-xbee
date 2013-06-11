@@ -39,6 +39,16 @@ module XBee
       end
     end
 
+    describe "#neighbors" do
+      it 'should return an array of neighbors' do
+        pending "decide if you want to work on this yet"
+        at_param_name = "ND"
+        @base_api_mode_interface.get_param(at_param_name) do | response |
+          response.at_command.upcase.should == ['foo']
+        end
+      end
+    end
+
   end
 
 end

@@ -2,7 +2,7 @@ $: << File.dirname(__FILE__)
 
 class String
   def xb_escape
-    self.gsub(/[\176\175\021\023]/) { |c| [0x7D, c[0] ^ 0x20].pack("CC")}
+    self.gsub(/[\176\175\021\023]/) { |c| [0x7D, c[0].ord ^ 0x20].pack("CC")}
   end
   def xb_unescape
     self.gsub(/\175./) { |ec| [ec.unpack("CC").last ^ 0x20].pack("C")}
@@ -41,7 +41,7 @@ module XBee
       sent_checksum = clean_data[-1]
       #puts "sent_checksum is #{sent_checksum}"
       #puts "computed checksum is #{Frame.checksum(clean_data[3..-2])}"
-      puts "clean_data is #{clean_data}"
+      #puts "clean_data is #{clean_data}"
 
       #puts "clean_data[3..-2] is #{clean_data[3..-2]}"
       unless sent_checksum == Frame.checksum(clean_data[3..-2])
@@ -95,7 +95,7 @@ module XBee
     def self.get_header(frame, input = STDIN, output = STDOUT)
       #header = source_io.read(3).xb_unescape
       header = frame[0..2]
-      output.puts "Read header: #{header.join(", ")}"
+      #output.puts "Read header: #{header.join(", ")}"
       header
     end
 

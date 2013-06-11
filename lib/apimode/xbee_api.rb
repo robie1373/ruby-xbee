@@ -31,19 +31,18 @@ module XBee
     end
 
     def get_param(at_param_name, at_param_unpack_string = nil)
-      puts "lib/apimode/xbee_api#get_param"
       frame_id = self.next_frame_id
       at_command_frame = XBee::Frame::ATCommand.new(at_param_name,frame_id,nil,at_param_unpack_string)
       puts "Sending ... [#{at_command_frame._dump.unpack("C*").join(", ")}]"
       self.xbee_serialport.write(at_command_frame._dump)
       result = XBee::Frame.new(self.xbee_serialport)
-      puts "command response = #{result.inspect}"
+      #puts "command response = #{result.inspect}"
       if result.kind_of?(XBee::Frame::ATCommandResponse) && result.status == :OK && result.frame_id == frame_id
         if block_given?
           yield result
         else
           #at_param_unpack_string.nil? ? result.retrieved_value : result.retrieved_value.unpack(at_param_unpack_string).first
-          puts "result.retrieved_value -> #{result.retrieved_value}"
+          #puts "result.retrieved_value -> #{result.retrieved_value}"
           return result.retrieved_value
         end
       else
@@ -88,6 +87,7 @@ module XBee
     def set_remote_param(at_param_name, param_value, remote_address = 0x000000000000ffff, remote_network_address = 0xfffe, at_param_unpack_string = nil)
       frame_id = self.next_frame_id
       at_command_frame = XBee::Frame::RemoteCommandRequest.new(at_param_name, remote_address, remote_network_address, frame_id, param_value, at_param_unpack_string)
+      puts "setting a remote paramater"
       puts "Sending ... [#{at_command_frame._dump.unpack("C*").join(", ")}]"
       self.xbee_serialport.write(at_command_frame._dump)
       r = XBee::Frame.new(self.xbee_serialport)
@@ -103,6 +103,7 @@ module XBee
     end
 
     def version_long
+      puts "WARNING: Version Long (VL) is depracated."
       @version_long ||= get_param("VL","a*")
     end
 
@@ -216,7 +217,7 @@ module XBee
     end
 
     def serial_num
-      self.serial_num_high() << 32 | self.serial_num_low
+      "#{self.serial_num_high()} #{self.serial_num_low}"
     end
 
     ##
