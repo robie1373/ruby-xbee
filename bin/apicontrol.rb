@@ -52,6 +52,10 @@ class ApiMode
     @result
   end
 
+  def remote_d0_low(remote_address)
+    @xbee.set_remote_param("D0", 0x04, remote_address, 0xfffe, "C") { |r| r.inspect }
+  end
+
   def run
     @output.puts "Testing API now ..."
     #output.puts "XBee Version: #{@xbee.version_long}"

@@ -48,6 +48,16 @@ describe "API binstub" do
                                               :SL,
                                               :STATUS]
     end
+
+    it "should set the remote radio D0 output low" do
+      pending "Not sure I want to write a test to actually set voltage on remote radios. Find another end to end test to use I think."
+      apimode = ApiMode.new(@serial_config, @input, @output)
+      apimode.show_nd
+      p apimode.result.nd.first
+      remote_address = "0x#{apimode.result.nd.first[:SH]}#{apimode.result.nd.first[:SH]}"
+      apimode.remote_d0_low(remote_address)
+      true.should == false
+    end
   end
 end
 
