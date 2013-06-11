@@ -12,14 +12,21 @@ module XBee
       end
 
       def cmd_data=(data_string)
+        puts "at_command_response#cmd_data data_string -> #{data_string}"
         #self.frame_id, self.at_command, status_byte, self.retrieved_value = data_string.unpack("Ca2Ca*")
-        self.frame_id, self.at_command, status_byte, self.retrieved_value = data_string
+        self.frame_id = data_string[1]
+        self.at_command = data_string[2].chr + data_string[3].chr
+        status_byte = data_string[4]
+        if data_string.length > 5
+          self.retrieved_value = data_string[5..-1]
+        end
 
         self.status = case status_byte
                         when 0..3
                           command_statuses[status_byte]
-        else raise "AT Command Response frame appears to include an invalid status: 0x%x" % status_byte
-        end
+                        else
+                          raise "AT Command Response frame appears to include an invalid status: 0x%x" % status_byte
+                      end
         #actually assign and move along
         @cmd_data = data_string
       end

@@ -42,12 +42,13 @@ module XBee
       #puts "sent_checksum is #{sent_checksum}"
       #puts "computed checksum is #{Frame.checksum(clean_data[3..-2])}"
       puts "clean_data is #{clean_data}"
+
       #puts "clean_data[3..-2] is #{clean_data[3..-2]}"
       unless sent_checksum == Frame.checksum(clean_data[3..-2])
         raise "Bad checksum - data discarded"
       end
 
-      case clean_data[7]
+      case data[0]
         when 0x8A
           ModemStatus.new(data)
         when 0x88
@@ -62,7 +63,7 @@ module XBee
           ExplicitRxIndicator.new(data)
       else ReceivedFrame.new(data)
       end
-      clean_data
+      #clean_data
     end
 
     #def self.get_cmd_data(frame_length, source_io)
@@ -113,6 +114,7 @@ module XBee
     end
 
     class Base
+
       attr_accessor :api_identifier, :cmd_data, :frame_id
 
       def api_identifier ; @api_identifier ||= 0x00 ; end
@@ -131,6 +133,10 @@ module XBee
         data.each_byte { |b| data_array << b }
         "~" + [length].pack("n").xb_escape + data.xb_escape + [Frame.checksum(data_array)].pack("C")
       end
+
+      def checksum(data)
+        Frame::checksum data
+      end
     end
 
     class ReceivedFrame < Base
@@ -138,7 +144,11 @@ module XBee
         raise "Frame data must be an enumerable type" unless frame_data.kind_of?(Enumerable)
         self.api_identifier = frame_data[0]
         # puts "Initializing a ReceivedFrame of type 0x%x" % self.api_identifier
-        self.cmd_data = frame_data[1..-1]
+        self.cmd_data = frame_data
+      end
+
+      def checksum(data = self.cmd_data)
+        super
       end
     end
   end

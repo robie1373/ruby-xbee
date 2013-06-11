@@ -2,6 +2,7 @@ require_relative "../../spec_helper"
 require_relative "../../../lib/apimode/xbee_api"
 require_relative "../../../lib/rf_module"
 require_relative "../../../lib/apimode/frame/frame"
+require_relative "../../../lib/apimode/frame/at_command_response"
 
 module XBee
   describe BaseAPIModeInterface do
@@ -17,17 +18,16 @@ module XBee
 
     describe "#fw_rev" do
       it "should get the firmware version" do
-        pending "fix up get_param first"
+        #pending "fix up get_param first"
         @base_api_mode_interface.fw_rev.should == "foo"
       end
     end
 
     describe "#get_param" do
       it "should yield a Frame to a block" do
-        at_param_name = "FW"
+        at_param_name = "VR"
         @base_api_mode_interface.get_param(at_param_name) do | response |
-          puts "do you have a valid source_io?"
-          response.should be_a_kind_of Frame
+          response.should be_a_kind_of Frame::ATCommandResponse
         end
       end
     end

@@ -37,7 +37,7 @@ module XBee
       puts "Sending ... [#{at_command_frame._dump.unpack("C*").join(", ")}]"
       self.xbee_serialport.write(at_command_frame._dump)
       result = XBee::Frame.new(self.xbee_serialport)
-      puts "command response = #{r}"
+      puts "command response = #{result}"
       if result.kind_of?(XBee::Frame::ATCommandResponse) && result.status == :OK && result.frame_id == frame_id
         if block_given?
           yield result

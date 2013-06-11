@@ -13,12 +13,12 @@ module XBee
     describe "module Frame" do
       before(:all) do
         @sample_frame_with_junk = [0x61, 0x62, 0x63, 0x31, 0x32, 0x33, 0x7e,
-                                   0x00, 0x04, 0x08, 0x52, 0x4e, 0x4a, 0x0d] .map { |i| i.chr }.join
-        @sample_at_cmd_frame = [0x7e, 0x00, 0x04, 0x08, 0x52, 0x4e, 0x4a, 0x0d]#.map { |i| i.chr }.join
-        @sample_at_response_frame = [0x7e, 0x00, 0x05, 0x88, 0x01, 0x42, 0x44, 0x00, 0xf0]#.map { |i| i.chr }.join
+                                   0x00, 0x04, 0x08, 0x52, 0x4e, 0x4a, 0x0d].map { |i| i.chr }.join
+        @sample_at_cmd_frame = [0x7e, 0x00, 0x04, 0x08, 0x52, 0x4e, 0x4a, 0x0d] #.map { |i| i.chr }.join
+        @sample_at_response_frame = [0x7e, 0x00, 0x05, 0x88, 0x01, 0x42, 0x44, 0x00, 0xf0] #.map { |i| i.chr }.join
         @sample_zb_tx_req_frame = [0x7e, 0x00, 0x16, 0x10, 0x01, 0x00, 0x13, 0xa2, 0x00,
                                    0x40, 0x0a, 0x01, 0x27, 0xff, 0xfe, 0x00, 0x00, 0x54,
-                                   0x78, 0x44, 0x61, 0x74, 0x61, 0x30, 0x41, 0x13]#.map { |i| i.chr }.join
+                                   0x78, 0x44, 0x61, 0x74, 0x61, 0x30, 0x41, 0x13] #.map { |i| i.chr }.join
         @sample_frames = [@sample_at_cmd_frame, @sample_at_response_frame]
       end
 
@@ -60,16 +60,10 @@ module XBee
           @source_io.read
         end
 
-        it "should return a frame header from a real radio" do
-          @source_io.write @at_command_frame._dump
-          frame = Frame.new(@source_io, @input, @output)
-          Frame.get_header(frame, @input, @output).should == [126, 0, 7]
-        end
-
         it "should compute a good checksum from a real radio" do
           @source_io.write @at_command_frame._dump
           frame = Frame.new(@source_io, @input, @output)
-          Frame.checksum frame
+          frame.checksum.should == 0x8A
         end
 
       end
