@@ -12,7 +12,9 @@ module XBee
       end
 
       def cmd_data=(data_string)
-        self.frame_id, self.at_command, status_byte, self.retrieved_value = data_string.unpack("Ca2Ca*")
+        #self.frame_id, self.at_command, status_byte, self.retrieved_value = data_string.unpack("Ca2Ca*")
+        self.frame_id, self.at_command, status_byte, self.retrieved_value = data_string
+
         self.status = case status_byte
                         when 0..3
                           command_statuses[status_byte]

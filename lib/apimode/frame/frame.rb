@@ -12,26 +12,38 @@ end
 module XBee
   module Frame
     def Frame.checksum(data)
-      0xFF - (data.unpack("C*").inject(0) { |sum, byte| (sum + byte) & 0xFF })
+      #0xFF - (data.unpack("C*").inject(0) { |sum, byte| (sum + byte) & 0xFF })
+      0xFF - (data.inject(0) { |sum, byte| (sum + byte) & 0xFF })
     end
 
     def Frame.new(source_io, input = STDIN, output = STDOUT)
       data = source_io.read
-      stray_bytes = stray_bytes(source_io)
+      #stray_bytes = stray_bytes(source_io)
+      stray_bytes, clean_data = stray_bytes(data)
       output.puts "Got some stray bytes for ya: #{stray_bytes.map {|b| "0x%x" % b}.join(", ")}" unless stray_bytes.empty?
 
-      header = get_header(source_io)
+      #header = get_header(source_io)
+      header = get_header(clean_data)
 
       frame_remaining = frame_length = api_identifier = ""
-      frame_length = get_length(header, source_io)
-      api_identifier = get_api_identifier(source_io)
+      #frame_length = get_length(header, source_io)
+      frame_length = header[1] + header[2]
+      #api_identifier = get_api_identifier(source_io)
+      api_identifier = clean_data[3]
 
-      cmd_data = get_cmd_data(frame_length, source_io)
+      #cmd_data = get_cmd_data(frame_length, source_io)
 
-      data = api_identifier.chr + cmd_data.xb_unescape
 
-      sent_checksum = source_io.getc
-      unless sent_checksum == Frame.checksum(data)
+      #data = api_identifier.chr + cmd_data.xb_unescape
+      data = clean_data[3..-2]
+
+      #sent_checksum = source_io.getc
+      sent_checksum = clean_data[-1]
+      #puts "sent_checksum is #{sent_checksum}"
+      #puts "computed checksum is #{Frame.checksum(clean_data[3..-2])}"
+      #puts "clean_data is #{clean_data}"
+      #puts "clean_data[3..-2] is #{clean_data[3..-2]}"
+      unless sent_checksum == Frame.checksum(clean_data[3..-2])
         raise "Bad checksum - data discarded"
       end
 
@@ -52,46 +64,51 @@ module XBee
       end
     end
 
-    def self.get_cmd_data(frame_length, source_io)
-      cmd_data_intended_length = frame_length - 1 #I think the -1 was wrong
-      cmd_data = ""
-      #source_io.seek(3)
-      #puts "source_io length is #{source_io.read.length}"
-      while ((unescaped_length = cmd_data.xb_unescape.length) < cmd_data_intended_length)
-        next_chunk = source_io.read(cmd_data_intended_length - unescaped_length)
-        cmd_data += next_chunk
-      end
-      cmd_data
-    end
+    #def self.get_cmd_data(frame_length, source_io)
+    #  cmd_data_intended_length = frame_length - 1 #I think the -1 was wrong
+    #  cmd_data = ""
+    #  #source_io.seek(3)
+    #  #puts "source_io length is #{source_io.read.length}"
+    #  while ((unescaped_length = cmd_data.xb_unescape.length) < cmd_data_intended_length)
+    #    next_chunk = source_io.read(cmd_data_intended_length - unescaped_length)
+    #    cmd_data += next_chunk
+    #  end
+    #  cmd_data
+    #end
+    #
+    #def self.get_api_identifier(data)
+    #  data[3]
+    #end
+    #
+    #def self.get_length(header, source_io)
+    #  header.delete!("~")
+    #  if header.length == 3
+    #    frame_length, delimiter = header.unpack("nC")
+    #  else
+    #    frame_length, delimiter = header.unpack("n").first, source_io.readchar
+    #  end
+    #  return frame_length
+    #end
 
-    def self.get_api_identifier(source_io)
-      source_io.seek(3)
-      source_io.read(1)
-    end
-
-    def self.get_length(header, source_io)
-      header.delete!("~")
-      if header.length == 3
-        frame_length, delimiter = header.unpack("nC")
-      else
-        frame_length, delimiter = header.unpack("n").first, source_io.readchar
-      end
-      return frame_length
-    end
-
-    def self.get_header(source_io, input = STDIN, output = STDOUT)
-      header = source_io.read(3).xb_unescape
-      output.puts "Read header: #{header.unpack("C*").join(", ")}"
+    def self.get_header(frame, input = STDIN, output = STDOUT)
+      #header = source_io.read(3).xb_unescape
+      header = frame[0..2]
+      output.puts "Read header: #{header.join(", ")}"
       header
     end
 
-    def self.stray_bytes(source_io, input = STDIN, output = STDOUT)
-      stray_bytes = []
-      until (start_delimiter = source_io.readchar.ord) == 0x7e
-        output.puts "Stray byte 0x%x" % start_delimiter.ord
-        stray_bytes << start_delimiter
-      end
-      stray_bytes
+    def self.stray_bytes(data, input = STDIN, output = STDOUT)
+      #stray_bytes = []
+      data_array = []
+      data.each_byte { |b| data_array << b }
+      stray_bytes = data_array.slice!(0...data_array.index(0x7e))
+      length = data_array[1] + data_array[2]
+      data_array.slice!((length + 4)..-1)
+      #until (start_delimiter = source_io.readchar.ord) == 0x7e
+      #  output.puts "Stray byte 0x%x" % start_delimiter.ord
+      #  stray_bytes << start_delimiter
+      #end
+      return stray_bytes, data_array
     end
 
     class Base
@@ -109,7 +126,9 @@ module XBee
 
       def _dump
         raise "Too much data (#{self.length} bytes) to fit into one frame!" if (self.length > 0xFFFF)
-        "~" + [length].pack("n").xb_escape + data.xb_escape + [Frame.checksum(data)].pack("C")
+        data_array = []
+        data.each_byte { |b| data_array << b }
+        "~" + [length].pack("n").xb_escape + data.xb_escape + [Frame.checksum(data_array)].pack("C")
       end
     end
 
