@@ -41,13 +41,13 @@ module XBee
       sent_checksum = clean_data[-1]
       #puts "sent_checksum is #{sent_checksum}"
       #puts "computed checksum is #{Frame.checksum(clean_data[3..-2])}"
-      #puts "clean_data is #{clean_data}"
+      puts "clean_data is #{clean_data}"
       #puts "clean_data[3..-2] is #{clean_data[3..-2]}"
       unless sent_checksum == Frame.checksum(clean_data[3..-2])
         raise "Bad checksum - data discarded"
       end
 
-      case data[0]
+      case clean_data[7]
         when 0x8A
           ModemStatus.new(data)
         when 0x88
@@ -62,6 +62,7 @@ module XBee
           ExplicitRxIndicator.new(data)
       else ReceivedFrame.new(data)
       end
+      clean_data
     end
 
     #def self.get_cmd_data(frame_length, source_io)

@@ -63,7 +63,7 @@ module XBee
         it "should return a frame header from a real radio" do
           @source_io.write @at_command_frame._dump
           frame = Frame.new(@source_io, @input, @output)
-          Frame.get_header(frame, @input, @output).should == "~\x00\x07"
+          Frame.get_header(frame, @input, @output).should == [126, 0, 7]
         end
 
         it "should compute a good checksum from a real radio" do
