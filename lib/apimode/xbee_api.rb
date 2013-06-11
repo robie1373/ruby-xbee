@@ -37,12 +37,14 @@ module XBee
       puts "Sending ... [#{at_command_frame._dump.unpack("C*").join(", ")}]"
       self.xbee_serialport.write(at_command_frame._dump)
       result = XBee::Frame.new(self.xbee_serialport)
-      puts "command response = #{result}"
+      puts "command response = #{result.inspect}"
       if result.kind_of?(XBee::Frame::ATCommandResponse) && result.status == :OK && result.frame_id == frame_id
         if block_given?
           yield result
         else
-          at_param_unpack_string.nil? ? result.retrieved_value : result.retrieved_value.unpack(at_param_unpack_string).first
+          #at_param_unpack_string.nil? ? result.retrieved_value : result.retrieved_value.unpack(at_param_unpack_string).first
+          puts "result.retrieved_value -> #{result.retrieved_value}"
+          return result.retrieved_value
         end
       else
         raise "Response did not indicate successful retrieval of that parameter: #{result.inspect}"
@@ -108,9 +110,7 @@ module XBee
   Retrieve XBee firmware version
 =end
     def fw_rev
-      puts "lib/apimode/xbee_api#fw_rev"
       @fw_rev ||= get_param("VR","n")
-      puts "At end of lib/apimode/xbee_api#fw_rev"
     end
 
 =begin rdoc

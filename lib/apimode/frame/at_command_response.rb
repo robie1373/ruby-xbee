@@ -8,7 +8,7 @@ module XBee
       end
 
       def command_statuses
-        [:OK, :ERROR, :Invalid_Command, :Invalid_Parameter]
+        [:OK, :ERROR, :Invalid_Command, :Invalid_Parameter, :TxFailure]
       end
 
       def cmd_data=(data_string)
@@ -18,11 +18,12 @@ module XBee
         self.at_command = data_string[2].chr + data_string[3].chr
         status_byte = data_string[4]
         if data_string.length > 5
-          self.retrieved_value = data_string[5..-1]
+          puts "literal retrieved value -> #{p data_string[5..-1].map! { |i| i.to_s(16)}}"
+          self.retrieved_value = data_string[5..-1].map! { |i| i.to_s(16) }.join
         end
 
         self.status = case status_byte
-                        when 0..3
+                        when 0..4
                           command_statuses[status_byte]
                         else
                           raise "AT Command Response frame appears to include an invalid status: 0x%x" % status_byte

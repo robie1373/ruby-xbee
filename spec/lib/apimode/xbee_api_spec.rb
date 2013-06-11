@@ -18,8 +18,8 @@ module XBee
 
     describe "#fw_rev" do
       it "should get the firmware version" do
-        #pending "fix up get_param first"
-        @base_api_mode_interface.fw_rev.should == "foo"
+        # "Check to make sure your firmware version is in the expectation array if this fails. Brittle test."
+        ["21A7", "23A7"].should include @base_api_mode_interface.fw_rev.upcase
       end
     end
 
@@ -28,6 +28,13 @@ module XBee
         at_param_name = "VR"
         @base_api_mode_interface.get_param(at_param_name) do | response |
           response.should be_a_kind_of Frame::ATCommandResponse
+        end
+      end
+
+      it "should have the param name in the response" do
+        at_param_name = "BD"
+        @base_api_mode_interface.get_param(at_param_name) do | response |
+          response.at_command.upcase.should == at_param_name
         end
       end
     end
