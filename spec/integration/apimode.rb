@@ -1,4 +1,5 @@
 require_relative "../spec_helper"
+require 'rspec'
 require_relative "../../lib/apimode/xbee_api"
 require_relative "../../lib/rf_module"
 require_relative "../../lib/apimode/xbee_api"
@@ -12,6 +13,7 @@ describe "end to end test of apimode" do
       input = StringIO.new("2\n")
       @radio_2_dev_string = get_xbee_usbdev_str(input, output)
   end
+
   describe "pass a message between 2 radios in apimode" do
 
     it "should have radio 1 available" do
@@ -42,11 +44,11 @@ describe "end to end test of apimode" do
   
     describe "check the fw_ver to see if the device is working" do
       it "should show me the fw_rev of the first radio" do
-        @dev1.fw_rev.should == "foo"
+        ["23a7", "21a7"].should include @dev1.fw_rev
       end
 
-      it "should show me the fw_rev of the first radio" do
-        @dev1.fw_rev.should == "foo"
+      it "should show me the fw_rev of the second radio" do
+        ["23a7", "21a7"].should include @dev2.fw_rev
       end
     end 
 
