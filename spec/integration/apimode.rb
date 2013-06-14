@@ -20,14 +20,16 @@ describe "end to end test of apimode" do
       #input = StringIO.new("1\n")
       #output = StringIO.new
       #@radio_1_dev_string = get_xbee_usbdev_str(input, output)
-      @radio_1_dev_string.should =~ /\/dev\/cu\.usbserial/
+      #@radio_1_dev_string.should =~ /\/dev\/cu\.usbserial/
+      @radio_1_dev_string.should =~ %r{#{platform_dev_string}}
     end
 
     it "should have radio 2 available" do
       #input = StringIO.new("2\n")
       #output = StringIO.new
       #@radio_2_dev_string = get_xbee_usbdev_str(input, output)
-      @radio_2_dev_string.should =~ /\/dev\/cu\.usbserial/
+      #@radio_2_dev_string.should =~ /\/dev\/cu\.usbserial/
+      @radio_2_dev_string.should =~ %r{#{platform_dev_string}}
     end
 
     it "the two radio dev strings should not be the same" do

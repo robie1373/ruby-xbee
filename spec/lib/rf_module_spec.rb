@@ -15,7 +15,7 @@ module XBee
       it "should return a valid usb serial device for my environment" do
         @input << "1\n"
         @input.rewind
-        get_xbee_usbdev_str(@input, @output).should =~ /\/dev\/cu\.usbserial-......../
+        get_xbee_usbdev_str(@input, @output).should =~ %r{#{platform_dev_string}}#/\/dev\/cu\.usbserial-......../
       end
     end
 
@@ -30,7 +30,7 @@ module XBee
 
       it "should show me the devices it found" do
 
-        @input << "1\n1\n"
+        @input << "1\n"
         @input.rewind
 
         self.ask_user_for_input(@devices, @input, @output)
@@ -38,9 +38,10 @@ module XBee
       end
 
       it "should return just the string of the device the user chooses" do
-        @input << "1\n1\n"
+        @input << "1\n"
         @input.rewind
-        self.ask_user_for_input(@devices, @input, @output).should == "/dev/cu.usbserial-A9014A2H"
+        self.ask_user_for_input(@devices, @input, @output).should =~ /\/dev\/cu\.usbserial-......../#%r{#{platform_dev_string}}
+        
       end
     end
   end

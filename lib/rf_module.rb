@@ -1,6 +1,18 @@
 require 'highline/import'
 module XBee
 
+  def platform_dev_string
+  platform = RUBY_PLATFORM.downcase
+    case
+    when platform =~ /darwin/
+      "/dev/cu\.usbserial*"
+    when platform =~ /linux/
+      "/dev/ttyUSB*"
+    else
+      raise "unknown or unsupported platform."
+    end
+  end
+
   def ask_user_for_input(list_array, input = STDIN, output = STDOUT)
     terminal = HighLine.new(input, output)
     answer = terminal.choose do |menu|
@@ -19,7 +31,7 @@ module XBee
           input.rewind
         end
       end
-      devices = Dir.glob("/dev/cu\.usbserial*")
+      devices = Dir.glob(platform_dev_string)
       case devices.length
         when 0
           raise "No USB Serial devices found"
