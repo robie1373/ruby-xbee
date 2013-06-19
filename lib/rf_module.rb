@@ -2,14 +2,14 @@ require 'highline/import'
 module XBee
 
   def platform_dev_string
-  platform = RUBY_PLATFORM.downcase
+    platform = RUBY_PLATFORM.downcase
     case
-    when platform =~ /darwin/
-      "/dev/cu\.usbserial*"
-    when platform =~ /linux/
-      "/dev/ttyUSB*"
-    else
-      raise "unknown or unsupported platform."
+      when platform =~ /darwin/
+        "/dev/cu\.usbserial*"
+      when platform =~ /linux/
+        "/dev/ttyUSB*"
+      else
+        raise "unknown or unsupported platform."
     end
   end
 
@@ -17,15 +17,18 @@ module XBee
     terminal = HighLine.new(input, output)
     answer = terminal.choose do |menu|
       menu.prompt = "Multiple USB Serial devices found. Which would you like to use?"
-      list_array.each { |dev| menu.choice dev.to_sym do dev end }
+      list_array.each { |dev| menu.choice dev.to_sym do
+        dev
+      end }
     end
     answer
   end
 
   def get_xbee_usbdev_str(input = STDIN, output = STDOUT)
     begin
-      unless input.tty?
-        unless input.is_a? StringIO
+      #unless input.tty?
+      unless input.is_a? StringIO
+        if MODE == :test
           input = StringIO.new
           input << "1\n"
           input.rewind

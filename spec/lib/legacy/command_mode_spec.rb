@@ -5,6 +5,7 @@ require_relative "../../../bin/ruby-xbee"
 module XBee
   describe BaseCommandModeInterface do
     before(:each) do
+      pending "come back to this once api mode is working"
       @serial_config = SerialConfig.new
       @base_command_mode_interface = BaseCommandModeInterface.new(@serial_config.xbee_usbdev_str,
                                                                   @serial_config.xbee_baud,
@@ -26,6 +27,7 @@ module XBee
 
     describe "Make sure you have a transparent mode xbee to work with. If this fails you probably don't." do
       it "should probe for an xbee in transparent" do
+        pending "come back to this once you have API mode working"
         @base_command_mode_interface.attention.should == "OK"
       end
     end

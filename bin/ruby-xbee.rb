@@ -12,8 +12,8 @@ end
 
 class SerialConfig
   include XBee
-  def initialize
-    @xbee_usbdev_str = get_xbee_usbdev_str
+  def initialize(input = STDIN, output = STDOUT)
+    @xbee_usbdev_str = get_xbee_usbdev_str(input, output)
   end
 
   def xbee_usbdev_str

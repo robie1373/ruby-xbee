@@ -7,10 +7,10 @@ require 'pp'
 
 class ApiMode
   def initialize(serial_config, input = STDIN, output = STDOUT)
-    @xbee = XBee::BaseAPIModeInterface.new(serial_config.xbee_usbdev_str)
     @output = output
     @input = input
     @result = Result.new
+    @xbee = XBee::BaseAPIModeInterface.new(serial_config.xbee_usbdev_str, @input, @output)
   end
   Result = Struct.new(:fw, :hw, :sh, :sl, :sn, :nd)
 
@@ -92,6 +92,7 @@ class ApiMode
 end
 
 apimode = ApiMode.new(@serial_config)
-if apimode.output.tty?
+
+unless MODE == :test
   apimode.run
 end

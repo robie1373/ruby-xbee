@@ -126,6 +126,7 @@ end
 
 xbeeinfo = XBeeInfo.new(@serial_config)
 #puts "This is after the XBeeinfo object instantiates in xbeeinfo.rb"
-if xbeeinfo.output.tty?
+#if xbeeinfo.output.tty?
+unless MODE == :test
   xbeeinfo.print
 end

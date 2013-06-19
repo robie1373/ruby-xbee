@@ -5,9 +5,9 @@ require_relative "../../bin/ruby-xbee"
 describe "API binstub" do
   describe ApiMode do
     before :each do
-      @input = StringIO.new
+      @input = StringIO.new("1\n")
       @output = StringIO.new
-      @serial_config = SerialConfig.new
+      @serial_config = SerialConfig.new(@input, @output)
     end
 
     it "should display the firmware rev" do

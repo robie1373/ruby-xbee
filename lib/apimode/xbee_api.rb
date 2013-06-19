@@ -5,9 +5,11 @@ require_relative "../rf_module"
 
 module XBee
   class BaseAPIModeInterface < RFModule
-    def initialize(xbee_usbdev_str, uart_config = XBeeUARTConfig.new)
+    def initialize(xbee_usbdev_str, input = STDIN, output = STDOUT, uart_config = XBeeUARTConfig.new)
       super(xbee_usbdev_str, uart_config)
       @frame_id = 1
+      @input = input
+      @output = output
       start_apimode_communication
     end
 
@@ -17,7 +19,7 @@ module XBee
 
     def start_apimode_communication
       in_command_mode do
-        puts "Entering api mode"
+        @output.puts "Entering api mode"
         # Reset module parameters to factory defaults ...
         self.xbee_serialport.write("ATRE\r")
         self.xbee_serialport.read(3)
@@ -33,7 +35,7 @@ module XBee
     def get_param(at_param_name, at_param_unpack_string = nil)
       frame_id = self.next_frame_id
       at_command_frame = XBee::Frame::ATCommand.new(at_param_name,frame_id,nil,at_param_unpack_string)
-      puts "Sending ... [#{at_command_frame._dump.unpack("C*").join(", ")}]"
+      @output.puts "Sending ... [#{at_command_frame._dump.unpack("C*").join(", ")}]"
       self.xbee_serialport.write(at_command_frame._dump)
       result = XBee::Frame.new(self.xbee_serialport)
       #puts "command response = #{result.inspect}"
@@ -70,7 +72,7 @@ module XBee
     def get_remote_param(at_param_name, remote_address = 0x000000000000ffff, remote_network_address = 0xfffe, at_param_unpack_string = nil)
       frame_id = self.next_frame_id
       at_command_frame = XBee::Frame::RemoteCommandRequest.new(at_param_name, remote_address, remote_network_address, frame_id, nil, at_param_unpack_string)
-      puts "Sending ... [#{at_command_frame._dump.unpack("C*").join(", ")}]"
+      @output.puts "Sending ... [#{at_command_frame._dump.unpack("C*").join(", ")}]"
       self.xbee_serialport.write(at_command_frame._dump)
       r = XBee::Frame.new(self.xbee_serialport)
       if r.kind_of?(XBee::Frame::RemoteCommandResponse) && r.status == :OK && r.frame_id == frame_id
@@ -87,8 +89,8 @@ module XBee
     def set_remote_param(at_param_name, param_value, remote_address = 0x000000000000ffff, remote_network_address = 0xfffe, at_param_unpack_string = nil)
       frame_id = self.next_frame_id
       at_command_frame = XBee::Frame::RemoteCommandRequest.new(at_param_name, remote_address, remote_network_address, frame_id, param_value, at_param_unpack_string)
-      puts "setting a remote paramater"
-      puts "Sending ... [#{at_command_frame._dump.unpack("C*").join(", ")}]"
+      @output.puts "setting a remote paramater"
+      @output.puts "Sending ... [#{at_command_frame._dump.unpack("C*").join(", ")}]"
       self.xbee_serialport.write(at_command_frame._dump)
       r = XBee::Frame.new(self.xbee_serialport)
       if r.kind_of?(XBee::Frame::RemoteCommandResponse) && r.status == :OK && r.frame_id == frame_id

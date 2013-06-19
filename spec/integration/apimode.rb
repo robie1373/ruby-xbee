@@ -2,7 +2,6 @@ require_relative "../spec_helper"
 require 'rspec'
 require_relative "../../lib/apimode/xbee_api"
 require_relative "../../lib/rf_module"
-require_relative "../../lib/apimode/xbee_api"
 
 describe "end to end test of apimode" do
   include XBee
