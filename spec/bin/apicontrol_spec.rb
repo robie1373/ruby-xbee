@@ -58,6 +58,32 @@ describe "API binstub" do
       apimode.remote_d0_low(remote_address)
       true.should == false
     end
+
+    describe "end to end message test" do
+      before :each do
+        @input1 = StringIO.new("1\n")
+        @output1 = StringIO.new
+        @input2 = StringIO.new("2\n")
+        @output2 = StringIO.new
+        @message = "Hello XBee"
+
+        @radio1_apimode = ApiMode.new(@serial_config, @input1, @output1)
+        @radio2_apimode = ApiMode.new(@serial_config, @input2, @output2)
+
+        dest_address = @radio1_apimode.show_sn
+        @radio1_apimode.transmit_req(dest_address, @message)
+        @received_message = @radio2_apimode.receive_packet
+      end
+
+      it "should send a string from radio one to radio two" do
+        received_message[:message].should == @message
+      end
+
+      it "should know the message came from radio 1" do
+        received_message[:source_addr].should == @radio1_apimode.adress64
+      end
+    end
+
   end
 end
 
